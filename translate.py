@@ -149,7 +149,7 @@ def process_paragraph(elem, processing_func):
     if elem.tail:
         assert elem.tail.strip() == '', f'paragraph tail is not whitespace: {repr(elem.tail)}'
 
-
+        
 # call a different processing function depending on element's tag (either process text together or separately)
 def walk_element(elem, processing_func):
     
@@ -158,47 +158,28 @@ def walk_element(elem, processing_func):
 
     _tag = strip_tag_namespace(elem.tag)
 
-    # # option 1: treat paragraphs and headers differently
+    # option 1: treat paragraphs and headers differently
 
-    #     # paragraph: concatenate everything together, contains full sentences cut up and distributed among child elements
-    #     # dd / li: description data / list item also a paragraph 
-    #     if _tag in ['p', 'dd', 'li']:
-    #         process_paragraph(elem, processing_func)
+        # paragraph: concatenate everything together, contains full sentences cut up and distributed among child elements
+        # dd / li: description data / list item also a paragraph 
+        if _tag in ['p', 'dd', 'li']:
+            process_paragraph(elem, processing_func)
 
-    #     # things that are not full sentences: translate .text and .tail separately. do not combine them
-    #     elif _tag in ['h1', 'h2', 'h3', 'h4', 'h5', 'a', 'dt', 'th', 'code', 'span', 'b', 'div', 'pre', 'table', 'tr', 'td', 'ol','ul', 'dl', 'blockquote', 'nav', 'body', 'strong', 'i', 'sub', 'sup', 'img', 'hr', 'br']:
+        # things that are not full sentences: translate .text and .tail separately. do not combine them
+        elif _tag in ['h1', 'h2', 'h3', 'h4', 'h5', 'a', 'dt', 'th', 'code', 'span', 'b', 'div', 'pre', 'table', 'tr', 'td', 'ol','ul', 'dl', 'blockquote', 'nav', 'body', 'strong', 'i', 'sub', 'sup', 'img', 'hr', 'br']:
 
-    #         # .text attribute holds the text content that appears immediately after the opening tag of an element.
-    #         if elem.text:
-    #             elem.text = processing_func(elem.text) # process it separately
+            # .text attribute holds the text content that appears immediately after the opening tag of an element.
+            if elem.text:
+                elem.text = processing_func(elem.text) # process it separately
             
-    #         # When an element has child nodes, the .text attribute contains the text content between 
-    #         # the opening tag of the element and the opening tag of the first child element. 
-    #         for child in elem.getchildren():
-    #             walk_element(child, processing_func) # this will consider the tag of the childs and if they are <p>, process it as paragraph
+            # When an element has child nodes, the .text attribute contains the text content between 
+            # the opening tag of the element and the opening tag of the first child element. 
+            for child in elem.getchildren():
+                walk_element(child, processing_func) # this will consider the tag of the childs and if they are <p>, process it as paragraph
             
-    #         # .tail attribute contains the text content between the closing tag of the element and the opening tag of the next sibling element.
-    #         if elem.tail:
-    #             elem.tail = processing_func(elem.tail) # process it separately
-
-    # option 2: treat them all as headers. This keeps latex in place, and considers separate chunks rather than entire paragraphs. 
-
-    # things that are not full sentences: translate .text and .tail separately. do not combine them
-    if _tag in ['p', 'dd', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'a', 'dt', 'th', 'code', 'span', 'b', 'div', 'pre', 'table', 'tr', 'td', 'ol','ul', 'dl', 'blockquote', 'nav', 'body', 'strong', 'i', 'sub', 'sup', 'img', 'hr', 'br']:
-
-        # .text attribute holds the text content that appears immediately after the opening tag of an element.
-        if elem.text:
-            elem.text = processing_func(elem.text) # process it separately
-        
-        # When an element has child nodes, the .text attribute contains the text content between 
-        # the opening tag of the element and the opening tag of the first child element. 
-        for child in elem.getchildren():
-            walk_element(child, processing_func) # this will consider the tag of the childs and if they are <p>, process it as paragraph
-        
-        # .tail attribute contains the text content between the closing tag of the element and the opening tag of the next sibling element.
-        if elem.tail:
-            elem.tail = processing_func(elem.tail) # process it separately
-
+            # .tail attribute contains the text content between the closing tag of the element and the opening tag of the next sibling element.
+            if elem.tail:
+                elem.tail = processing_func(elem.tail) # process it separately
 
     else:
         assert False, f'unsupported tag: {_tag}'
