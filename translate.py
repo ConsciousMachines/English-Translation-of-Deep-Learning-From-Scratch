@@ -17,12 +17,7 @@
 # strong, i, sub, sup
 # also added img, hr, br because apparently they have text/tail sometimes 
 
-
-# TODO: some weird html result from google translate such as '&amp;#39;' and '&amp;quot;' need to be adjusted manually
-#       idea: go over the translation patch files and replace things that start with "&"
-#       .replace('&amp;quot;',"'").replace('&amp;#39;',"'")
-
-# TODO: try render paragraphs separately, compare difference
+# NOTE: there is a tiny amount of untranslated text mixed in with code - Google Translate API marked the entire thing as code, and left it as is
 
 import os
 import re
@@ -30,19 +25,12 @@ import time
 import zipfile 
 import hashlib
 from lxml import etree
-from google.cloud import translate_v2 as translate
-# make sure the private key is in the environment, for google API to work (put it in .bashrc)
-# export GOOGLE_APPLICATION_CREDENTIALS="/home/chad/Downloads/symmetric-span-382608-57553f98cfda.json"
 
 
 class text_processor:
     def __init__(self):
-        
         self.counter                = 0
-
-        self.translate_client       = translate.Client()
         self.japanese_re            = re.compile(r'[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]')
-
         self.DEBUG                  = False
         # self.DEBUG                  = True
 
@@ -84,6 +72,12 @@ class text_processor:
             return text # otherwise return original text
     
     def translate_init(self, patch_file_ptr): # we are given opened file to store translations in 
+
+        from google.cloud import translate_v2 as translate
+        # make sure the private key is in the environment, for google API to work (put it in .bashrc)
+        # export GOOGLE_APPLICATION_CREDENTIALS="/home/chad/Downloads/symmetric-span-382608-57553f98cfda.json"
+
+        self.translate_client       = translate.Client()
         self.patch_file_ptr         = patch_file_ptr
 
     def patch_text(self, text):
@@ -149,7 +143,7 @@ def process_paragraph(elem, processing_func):
     if elem.tail:
         assert elem.tail.strip() == '', f'paragraph tail is not whitespace: {repr(elem.tail)}'
 
-      
+
 # call a different processing function depending on element's tag (either process text together or separately)
 def walk_element(elem, processing_func):
     
@@ -182,7 +176,24 @@ def walk_element(elem, processing_func):
             elem.tail = processing_func(elem.tail) # process it separately
 
     else:
-        assert False, f'unsupported tag: {_tag}'
+        raise Exception(f'unsupported tag: {_tag}')
+
+
+    # # option 2: (not as coherent) treat them all as headers. This keeps latex in place, and considers separate chunks rather than entire paragraphs. 
+
+    # # .text attribute holds the text content that appears immediately after the opening tag of an element.
+    # if elem.text:
+    #     elem.text = processing_func(elem.text) # process it separately
+    
+    # # When an element has child nodes, the .text attribute contains the text content between 
+    # # the opening tag of the element and the opening tag of the first child element. 
+    # for child in elem.getchildren():
+    #     walk_element(child, processing_func) # this will consider the tag of the childs and if they are <p>, process it as paragraph
+    
+    # # .tail attribute contains the text content between the closing tag of the element and the opening tag of the next sibling element.
+    # if elem.tail:
+    #     elem.tail = processing_func(elem.tail) # process it separately
+
 
 
 
@@ -190,7 +201,7 @@ def walk_element(elem, processing_func):
 def create_translation_patch(book_path):
 
     book_name          = os.path.basename(book_path).replace('.epub', '')
-    patch_file_path    = os.path.join(os.path.dirname(book_path), f'{book_name}_patch.txt')
+    patch_file_path    = os.path.join(os.path.dirname(book_path), f'{book_name}_patch_orig.txt')
     tp                 = text_processor()
         
     with zipfile.ZipFile(book_path, 'r') as zip_file:
@@ -265,8 +276,43 @@ def patch_book(book_path, patch_file_path):
                     new_zip.writestr(file_name, file_content)
 
 
-work_dir = r'/home/chad/Desktop/_backups/DLFS'
-for i in [r'DL1.epub', r'DL2.epub', r'DL3.epub', r'DL4.epub']:
-    book_path = os.path.join(work_dir, i)
-    patch_file_path    = create_translation_patch(book_path)
-    patch_book(book_path, patch_file_path)
+# generate patch file by translating with Google Cloud API
+epubs_dir = '/home/chad/Desktop/_backups/DLFS'
+for i in ['DL1', 'DL2', 'DL3', 'DL4']:   
+    one_epubs = os.path.join(epubs_dir, f'{i}.epub')
+    one_patch = create_translation_patch(one_epubs)
+
+
+# translate EPUB with patch file
+epubs_dir = '/home/chad/Desktop/_backups/DLFS'
+patch_dir = '/home/chad/Desktop/_backups/DLFS/version_1'
+for i in ['DL1', 'DL2', 'DL3', 'DL4']:    
+    one_epubs = os.path.join(epubs_dir, f'{i}.epub')
+    one_patch = os.path.join(patch_dir, f'{i}_patch.txt')
+    patch_book(one_epubs, one_patch)
+
+
+# # fix the patch files (replace weird html) - only needs to be done once, and I already did it. 
+# import os
+
+# patch_dir = '/home/chad/Desktop/_backups/DLFS/version_1'
+# os.chdir(patch_dir)
+# patch_files = [i for i in os.listdir(patch_dir) if i.__contains__('_orig')]
+
+# for patch_file in patch_files:
+
+#     # open original patch
+#     with open(patch_file, 'r') as f:
+#         patch = f.read()
+
+#     # replace weird HTML 
+#     patch = patch.replace('&#39;', "'")
+#     patch = patch.replace('&quot;', "'")
+#     patch = patch.replace('&amp;quot;', "'")
+#     patch = patch.replace('&amp;#39;', "'")
+#     patch = patch.replace('&gt;', '>')
+
+#     # save fixed patch
+#     with open(patch_file.replace('_orig',''), 'w') as f:
+#         _ = f.write(patch)
+
