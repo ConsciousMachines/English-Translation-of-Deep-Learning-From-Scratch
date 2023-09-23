@@ -1,24 +1,3 @@
-
-
-# # h1..h4 : titles, process them separately 
-# # a: anchor, hyperlink. 
-# # dt: description term. like a header
-# # th: table header
-# # code: code
-# # span: idk what it does
-# # b: bold
-# # div: container for a style or something. do recursively
-# # pre: preformatted text, in this case code snippets. only comments need translating 
-# # table / tr / td: table, row, data
-# # ol / ul / dl : ordered unordered description list 
-# # blockquote: makes it a quote
-# # nav: table of contents
-# book 2 tags:
-# strong, i, sub, sup
-# also added img, hr, br because apparently they have text/tail sometimes 
-
-# NOTE: there is a tiny amount of untranslated text mixed in with code - Google Translate API marked the entire thing as code, and left it as is
-
 import os
 import re
 import time
@@ -291,6 +270,29 @@ for i in ['DL1', 'DL2', 'DL3', 'DL4']:
     one_patch = os.path.join(patch_dir, f'{i}_patch.txt')
     patch_book(one_epubs, one_patch)
 
+
+
+
+
+
+# # h1..h4 : titles, process them separately 
+# # a: anchor, hyperlink. 
+# # dt: description term. like a header
+# # th: table header
+# # code: code
+# # span: idk what it does
+# # b: bold
+# # div: container for a style or something. do recursively
+# # pre: preformatted text, in this case code snippets. only comments need translating 
+# # table / tr / td: table, row, data
+# # ol / ul / dl : ordered unordered description list 
+# # blockquote: makes it a quote
+# # nav: table of contents
+# book 2 tags:
+# strong, i, sub, sup
+# also added img, hr, br because apparently they have text/tail sometimes 
+
+# NOTE: there is a tiny amount of untranslated text mixed in with code - Google Translate API marked the entire thing as code, and left it as is
 
 # # fix the patch files (replace weird html) - only needs to be done once, and I already did it. 
 # import os
