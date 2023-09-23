@@ -6,11 +6,11 @@ This is a translation of the best book series ever written, called [Deep Learnin
 
 ## Why?
 
-There are a lot of books on Deep Learning, but they all drone on forever when it would be much faster to just see how it works via code. Notable exceptions in English are [micrograd](https://github.com/karpathy/micrograd) by Andrej Karpathy, and  [Neural Networks and Deep Learning](http://neuralnetworksanddeeplearning.com/index.html) by Michael Nielsen. However these are just toys. I stumbled upon DLFS, which is capable of running models of arbitrary complexity, with a book to explain it all! As such, this is the **only resource anybody needs to understand deep learning**. 
+There are a lot of books on Deep Learning, but they all drone on forever when it would be much faster to just see how it works via code. Notable exceptions in English are [micrograd](https://github.com/karpathy/micrograd) by Andrej Karpathy, and  [Neural Networks and Deep Learning](http://neuralnetworksanddeeplearning.com/index.html) by Michael Nielsen. However, these are just toys. I stumbled upon DLFS, which is capable of running models of arbitrary complexity, with a book to explain it all! As such, this is the **only resource anybody needs to understand deep learning**. 
 
 ## Usage
 
-Simply updating the path of your .EPUB file:
+Simply update the path of your .EPUB file:
 
 ```Python
 book_path          = r'/path/to/books/DL1.epub'
