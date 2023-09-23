@@ -2,7 +2,7 @@
 
 This is a translation of the best book series ever written, called [Deep Learning From Scrach](https://koki0702.github.io/dezero-book/en/index.html). I already did the translation using Google Translate API. If you buy the book, you can use the patch files I made to translate your own copy!
 
-![sample.png]([path/to/image.png](https://github.com/ConsciousMachines/English-Translation-of-Deep-Learning-From-Scratch/blob/main/docs/sample.png))
+![sample.png](https://github.com/ConsciousMachines/English-Translation-of-Deep-Learning-From-Scratch/blob/main/docs/sample.png)
 
 ## Why?
 
